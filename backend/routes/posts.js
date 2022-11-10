@@ -41,6 +41,11 @@ router.post('', checkAuth, multer({storage: storage}).single('image'), (req, res
       post: {...createdPost,
       id: createdPost._id}
     });
+  })
+  .catch(error => {
+    res.status(500).json({
+      message: 'Error creating post'
+    })
   });
 });
 
@@ -67,8 +72,13 @@ router.put(
       if (result.modifiedCount > 0) {
         res.status(200).json({ message: "Update successful!" });
       } else {
-        res.status(401).json({ message: "NOT AUTHORIZED" });
+        res.status(401).json({ message: "Not Authorized" });
       }
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: 'Couldn\'t update post'
+      })
     });
   }
 );
@@ -92,6 +102,11 @@ router.get('', (req, res, next) => {
         posts: fecthedPosts,
         maxPosts: count
       })
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: 'Fetching posts failed!'
+      });
     });
 });
 
@@ -102,6 +117,11 @@ router.get('/:id', (req, res, next) => {
     } else {
       res.status(404).json({message: 'Post not found!'});
     }
+  })
+  .catch(err => {
+    res.status(500).json({
+      message: 'Error occured while trying to find the post'
+    });
   });
 });
 
@@ -114,6 +134,11 @@ router.delete('/:id', checkAuth, (req, res, next) => {
     } else {
       res.status(401).json({ message: "NOT AUTHORIZED" });
     }
+  })
+  .catch(err => {
+    res.status(500).json({
+      message: 'Error occured while trying to find the post'
+    });
   });
 });
 

@@ -21,9 +21,9 @@ router.post('/signup', (req, res, next) => {
           })
           .catch(err => {
             res.status(500).json({
-              error: err
+                message: "Invalid authentication, user already exists"
             });
-        })
+        });
     });
 });
 
@@ -54,7 +54,7 @@ router.post('/login', (req, res, next) => {
     })
     .catch(err => {
       return res.status(401).json({
-        message: 'Auth failed'
+        message: 'Auth failed invalid authentication credentials'
       });
     })
 });

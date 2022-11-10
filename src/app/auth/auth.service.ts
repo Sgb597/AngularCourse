@@ -12,7 +12,7 @@ export class AuthService {
   private tokenTimer: NodeJS.Timer;
   private token: string;
   private userId: string;
-  private AuthStatusListener = new Subject<boolean>();
+  private authStatusListener = new Subject<boolean>();
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -25,19 +25,18 @@ export class AuthService {
   }
 
   getAuthStatusListener() {
-    return this.AuthStatusListener.asObservable();
+    return this.authStatusListener.asObservable();
   }
   getToken() {
     return this.token;
   }
   createUser(email: string, password: string) {
     const authData: AuthData = { email: email, password: password };
-    this.http
-      .post('http://localhost:3000/api/users/signup', authData)
-      .subscribe((res) => {
-        console.log(res);
-        this.router.navigate(['/']);
-      });
+    this.http.post('http://localhost:3000/api/users/signup', authData).subscribe(() => {
+      this.router.navigate(['/']);
+    }, error => {
+      this.authStatusListener.next(false);
+    });
   }
 
   login(email: string, password: string) {
@@ -56,7 +55,7 @@ export class AuthService {
           this.setAuthTimer(expiresInDuration);
           this.isAuthenticated = true;
           this.userId = res.userId;
-          this.AuthStatusListener.next(true);
+          this.authStatusListener.next(true);
           const now = new Date();
           const expirationDate = new Date(
             now.getTime() + expiresInDuration * 1000
@@ -65,6 +64,8 @@ export class AuthService {
           this.saveAuthData(token, expirationDate, this.userId);
           this.router.navigate(['/']);
         }
+      }, error => {
+        this.authStatusListener.next(false);
       });
   }
 
@@ -80,14 +81,14 @@ export class AuthService {
       this.isAuthenticated = true;
       this.userId = authInformation.userId;
       this.setAuthTimer(expiresIn / 1000);
-      this.AuthStatusListener.next(true);
+      this.authStatusListener.next(true);
     }
   }
 
   logout() {
     this.token = null;
     this.isAuthenticated = false;
-    this.AuthStatusListener.next(false);
+    this.authStatusListener.next(false);
     this.router.navigate(['/']);
     this.clearAuthData();
     this.userId = null;
