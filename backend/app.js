@@ -6,7 +6,7 @@ const { default: mongoose } = require('mongoose');
 const postsRotues = require('./routes/posts');
 const usersRoutes = require('./routes/users');
 
-const mongoUrl = 'mongodb+srv://sgb597:sebas2007@cluster0.bkhuoy1.mongodb.net/?retryWrites=true&w=majority';
+const mongoUrl = `mongodb+srv://sgb597:${process.env.MONGO_ATLAS_PW}@cluster0.bkhuoy1.mongodb.net/?retryWrites=true&w=majority`;
 
 const app = express();
 mongoose.connect(mongoUrl)
